@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>椰子电玩租赁 ERP 系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局CSS变量 */
+        :root {
+            --primary-color: #E60012;
+            --primary-dark: #C40010;
+            --primary-light: #FFEBEE;
+            --secondary-color: #0066CC;
+            --success-color: #00C853;
+            --danger-color: #D32F2F;
+            --warning-color: #FF9800;
+            --info-color: #0288D1;
+            --white: #FFFFFF;
+            --bg-primary: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --bg-hover: #F5F5F5;
+            --border-color: #E0E0E0;
+            --border-light: #EEEEEE;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --text-light: #9E9E9E;
+            --text-white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --transition: all 0.2s ease;
+        }
+        * {margin: 0;padding: 0;box-sizing: border-box;}
+        body {font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;background: var(--bg-primary);min-height: 100vh;color: var(--text-primary);line-height: 1.6;overflow-x: hidden;}
+        ::-webkit-scrollbar {width: 6px;height: 6px;}
+        ::-webkit-scrollbar-track {background: var(--bg-primary);border-radius: 10px;}
+        ::-webkit-scrollbar-thumb {background: var(--text-light);border-radius: 10px;transition: var(--transition);}
+        ::-webkit-scrollbar-thumb:hover {background: var(--text-secondary);}
+
+        /* 布局样式 */
+        .app-container {display: flex;width: 100%;min-height: 100vh;}
+        .sidebar {width: 260px;background: var(--bg-card);border-right: 1px solid var(--border-color);padding: 20px 0;display: flex;flex-direction: column;position: fixed;height: 100vh;z-index: 100;transition: var(--transition);overflow-y: auto;}
+        .sidebar-logo {padding: 0 20px 20px;border-bottom: 1px solid var(--border-light);margin-bottom: 8px;}
+        .sidebar-logo h2 {color: var(--primary-color);font-size: 20px;font-weight: 700;display: flex;align-items: center;gap: 10px;}
+        .sidebar-logo h2 i {font-size: 24px;}
+        .sidebar-nav {flex: 1;overflow-y: auto;padding: 0 12px;}
+        .nav-item {display: flex;align-items: center;gap: 12px;padding: 12px 16px;border-radius: var(--radius-md);color: var(--text-secondary);text-decoration: none;margin-bottom: 4px;transition: var(--transition);cursor: pointer;font-weight: 500;font-size: 14px;}
+        .nav-item i {font-size: 16px;width: 20px;text-align: center;}
+        .nav-item .submenu-arrow {margin-left: auto;font-size: 12px;transition: var(--transition);}
+        .nav-item:hover {background: var(--bg-hover);color: var(--primary-color);}
+        .nav-item.active {background: var(--primary-light);color: var(--primary-color);font-weight: 600;}
+        .nav-item.has-submenu.active {background: var(--bg-hover);}
+        .submenu {overflow: hidden;max-height: 0;transition: max-height 0.3s ease;padding-left: 20px;margin-bottom: 0;}
+        .submenu.active {max-height: 600px;margin-bottom: 8px;}
+        .submenu-item {display: flex;align-items: center;gap: 12px;padding: 10px 16px;border-radius: var(--radius-md);color: var(--text-secondary);text-decoration: none;margin-bottom: 2px;transition: var(--transition);cursor: pointer;font-weight: 500;font-size: 13px;}
+        .submenu-item i {font-size: 14px;width: 18px;text-align: center;}
+        .submenu-item:hover {background: var(--bg-hover);color: var(--primary-color);}
+        .submenu-item.active {background: var(--primary-light);color: var(--primary-color);font-weight: 600;}
+        .main-content {flex: 1;margin-left: 260px;padding: 24px;width: calc(100% - 260px);}
+        .top-header {background: var(--bg-card);border: 1px solid var(--border-color);border-radius: var(--radius-lg);padding: 16px 24px;margin-bottom: 24px;display: flex;justify-content: space-between;align-items: center;box-shadow: var(--shadow-sm);}
+        .header-title h1 {color: var(--text-primary);font-size: 24px;font-weight: 700;}
+        .header-actions {display: flex;gap: 12px;flex-wrap: wrap;}
+
+        /* 通用组件样式 */
+        .card {background: var(--bg-card);border: 1px solid var(--border-color);border-radius: var(--radius-lg);padding: 24px;margin-bottom: 24px;box-shadow: var(--shadow-sm);transition: var(--transition);}
+        .card:hover {box-shadow: var(--shadow-md);}
+        .card-header {display: flex;justify-content: space-between;align-items: center;margin-bottom: 20px;flex-wrap: wrap;gap: 12px;}
+        .card-title {color: var(--text-primary);font-size: 18px;font-weight: 600;display: flex;align-items: center;gap: 10px;}
+        .card-title i {color: var(--primary-color);font-size: 20px;}
+        .btn {padding: 8px 16px;border-radius: var(--radius-md);border: none;font-family: inherit;font-size: 14px;font-weight: 500;cursor: pointer;transition: var(--transition);display: inline-flex;align-items: center;gap: 8px;white-space: nowrap;text-decoration: none;}
+        .btn-primary {background: var(--primary-color);color: var(--text-white);box-shadow: var(--shadow-sm);}
+        .btn-primary:hover {background: var(--primary-dark);box-shadow: var(--shadow-md);transform: translateY(-1px);}
+        .btn-secondary {background: var(--white);color: var(--text-primary);border: 1px solid var(--border-color);}
+        .btn-secondary:hover {background: var(--bg-hover);border-color: var(--primary-color);color: var(--primary-color);transform: translateY(-1px);}
+        .btn-success {background: var(--success-color);color: var(--text-white);box-shadow: var(--shadow-sm);}
+        .btn-success:hover {background: #00A844;box-shadow: var(--shadow-md);transform: translateY(-1px);}
+        .btn-danger {background: var(--danger-color);color: var(--text-white);box-shadow: var(--shadow-sm);}
+        .btn-danger:hover {background: #B71C1C;box-shadow: var(--shadow-md);transform: translateY(-1px);}
+        .btn-warning {background: var(--warning-color);color: var(--text-white);box-shadow: var(--shadow-sm);}
+        .btn-warning:hover {background: #F57C00;box-shadow: var(--shadow-md);transform: translateY(-1px);}
+        .btn-sm {padding: 6px 12px;font-size: 13px;}
+        .btn:disabled {opacity: 0.5;cursor: not-allowed;transform: none !important;}
+
+        /* 表单样式 */
+        .form-group {margin-bottom: 16px;}
+        .form-label {display: block;color: var(--text-primary);font-weight: 500;margin-bottom: 8px;font-size: 14px;}
+        .form-control {width: 100%;padding: 10px 14px;border-radius: var(--radius-md);border: 1px solid var(--border-color);background: var(--white);color: var(--text-primary);font-family: inherit;font-size: 14px;transition: var(--transition);}
+        .form-control:focus {outline: none;border-color: var(--primary-color);box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);}
+        .form-control::placeholder {color: var(--text-light);}
+        .form-control:disabled {background: var(--bg-hover);color: var(--text-secondary);cursor: not-allowed;}
+        .form-row {display: flex;gap: 16px;flex-wrap: wrap;margin-bottom: 16px;}
+        .form-col {flex: 1;min-width: 200px;}
+        .search-bar {display: flex;gap: 12px;flex-wrap: wrap;margin-bottom: 20px;}
+        .search-bar .form-control {flex: 1;min-width: 200px;}
+        .form-check {display: flex;align-items: center;margin-bottom: 10px;}
+        .form-check input {width: 16px;height: 16px;margin-right: 8px;accent-color: var(--primary-color);}
+        .form-check label {color: var(--text-primary);font-size: 14px;cursor: pointer;}
+
+        /* 统计卡片 */
+        .stats-grid {display: grid;grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));gap: 20px;margin-bottom: 24px;}
+        .stat-card {background: var(--bg-card);border: 1px solid var(--border-color);border-radius: var(--radius-lg);padding: 20px;box-shadow: var(--shadow-sm);transition: var(--transition);}
+        .stat-card:hover {box-shadow: var(--shadow-md);transform: translateY(-2px);}
+        .stat-header {display: flex;justify-content: space-between;align-items: flex-start;margin-bottom: 12px;}
+        .stat-icon {width: 48px;height: 48px;border-radius: var(--radius-md);display: flex;align-items: center;justify-content: center;font-size: 20px;color: var(--text-white);}
+        .stat-icon.primary {background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);}
+        .stat-icon.success {background: linear-gradient(135deg, var(--success-color) 0%, #00A844 100%);}
+        .stat-icon.warning {background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);}
+        .stat-icon.danger {background: linear-gradient(135deg, var(--danger-color) 0%, #B71C1C 100%);}
+        .stat-icon.info {background: linear-gradient(135deg, var(--info-color) 0%, #0277BD 100%);}
+        .stat-label {color: var(--text-secondary);font-size: 14px;font-weight: 500;margin-bottom: 4px;}
+        .stat-value {color: var(--text-primary);font-size: 28px;font-weight: 700;line-height: 1.2;}
+
+        /* 表格样式 */
+        .table-responsive {overflow-x: auto;border-radius: var(--radius-md);border: 1px solid var(--border-color);}
+        .data-table {width: 100%;border-collapse: collapse;color: var(--text-primary);}
+        .data-table thead {background: var(--primary-color);}
+        .data-table thead th {padding: 12px 16px;text-align: left;font-weight: 600;font-size: 14px;white-space: nowrap;color: var(--text-white);}
+        .data-table tbody tr {border-bottom: 1px solid var(--border-light);transition: var(--transition);}
+        .data-table tbody tr:hover {background: var(--bg-primary);}
+        .data-table tbody td {padding: 12px 16px;font-size: 14px;}
+        .data-table tbody tr:last-child {border-bottom: none;}
+        .table-actions {display: flex;gap: 8px;flex-wrap: wrap;}
+
+        /* 状态徽章 */
+        .status-badge {display: inline-block;padding: 4px 10px;border-radius: 20px;font-size: 12px;font-weight: 500;white-space: nowrap;}
+        .status-available {background: #E8F5E9;color: var(--success-color);border: 1px solid #C8E6C9;}
+        .status-occupied {background: #FFF3E0;color: var(--warning-color);border: 1px solid #FFE0B2;}
+        .status-rented {background: #FFEBEE;color: var(--danger-color);border: 1px solid #FFCDD2;}
+        .status-repair {background: #F5F5F5;color: var(--text-secondary);border: 1px solid #EEEEEE;}
+        .status-shipping {background: #E3F2FD;color: var(--info-color);border: 1px solid #BBDEFB;}
+        .status-overdue {background: #FFEBEE;color: var(--danger-color);border: 1px solid #FFCDD2;font-weight: 600;}
+        .status-success {background: #E8F5E9;color: var(--success-color);border: 1px solid #C8E6C9;}
+        .status-warning-1 {background: #FFF8E1;color: #FFA000;border: 1px solid #FFE082;}
+        .status-warning-2 {background: #FFF3E0;color: #F57C00;border: 1px solid #FFCC80;}
+        .status-warning-3 {background: #FFEBEE;color: var(--danger-color);border: 1px solid #FFCDD2;}
+        .status-out-sold {background: #E8F5E9;color: var(--success-color);border: 1px solid #C8E6C9;}
+        .status-out-scrap {background: #F5F5F5;color: var(--text-secondary);border: 1px solid #EEEEEE;}
+
+        /* 弹窗样式 */
+        .modal-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.5);backdrop-filter: blur(2px);display: none;align-items: center;justify-content: center;z-index: 1000;padding: 20px;animation: fadeIn 0.2s ease;}
+        .modal-overlay.active {display: flex;}
+        .modal {background: var(--bg-card);border: 1px solid var(--border-color);border-radius: var(--radius-xl);width: 100%;max-width: 800px;max-height: 90vh;overflow-y: auto;box-shadow: var(--shadow-lg);animation: slideUp 0.2s ease;}
+        .modal.small-modal {max-width: 500px;}
+        .modal-header {padding: 20px 24px;border-bottom: 1px solid var(--border-light);display: flex;justify-content: space-between;align-items: center;}
+        .modal-title {color: var(--text-primary);font-size: 18px;font-weight: 600;}
+        .modal-close {background: none;border: none;color: var(--text-secondary);font-size: 20px;cursor: pointer;transition: var(--transition);width: 32px;height: 32px;display: flex;align-items: center;justify-content: center;border-radius: var(--radius-sm);}
+        .modal-close:hover {background: var(--bg-hover);color: var(--primary-color);}
+        .modal-body {padding: 24px;}
+        .modal-footer {padding: 16px 24px;border-top: 1px solid var(--border-light);display: flex;justify-content: flex-end;gap: 12px;}
+        .dropdown-menu {position: absolute;background: var(--white);border: 1px solid var(--border-color);border-radius: var(--radius-md);box-shadow: var(--shadow-lg);z-index: 9999;max-height: 300px;overflow-y: auto;display: none;width: 100%;}
+        .dropdown-menu.active {display: block;}
+        .dropdown-item {padding: 10px 16px;color: var(--text-primary);cursor: pointer;transition: var(--transition);font-size: 14px;border-bottom: 1px solid var(--border-light);}
+        .dropdown-item:last-child {border-bottom: none;}
+        .dropdown-item:hover {background: var(--bg-primary);color: var(--primary-color);}
+
+        /* 动画 */
+        @keyframes fadeIn {from {opacity: 0;}to {opacity: 1;}}
+        @keyframes slideUp {from {transform: translateY(10px);opacity: 0;}to {transform: translateY(0);opacity: 1;}}
+        .tab-content {display: none;animation: fadeIn 0.2s ease;}
+        .tab-content.active {display: block;}
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .sidebar {width: 70px;padding: 20px 8px;}
+            .sidebar-logo h2 span, .nav-item span, .nav-item .submenu-arrow, .submenu {display: none;}
+            .sidebar-logo {padding: 0 8px 20px;}
+            .nav-item {justify-content: center;padding: 12px;}
+            .main-content {margin-left: 70px;width: calc(100% - 70px);padding: 16px;}
+            .stats-grid {grid-template-columns: 1fr;}
+            .form-row {flex-direction: column;gap: 12px;}
+            .form-col {min-width: 100%;}
+            .header-actions {width: 100%;justify-content: flex-end;}
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏导航 - 完整重构架构 -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2><i class="fas fa-gamepad"></i> <span>椰子电玩ERP</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- 一级菜单：首页概览 -->
+                <a class="nav-item active" data-target="tab-dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>首页概览</span>
+                </a>
+
+                <!-- 一级菜单：库存资产管理 -->
+                <div class="nav-item has-submenu" id="stockMenu">
+                    <i class="fas fa-boxes"></i>
+                    <span>库存资产管理</span>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </div>
+                <div class="submenu" id="stockSubmenu">
+                    <a class="submenu-item" data-target="tab-stock-list">
+                        <i class="fas fa-box"></i>
+                        <span>卡带库存管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-stock-in">
+                        <i class="fas fa-download"></i>
+                        <span>卡带采购入库</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-stock-age">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>库龄预警管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-stock-out">
+                        <i class="fas fa-upload"></i>
+                        <span>资产出库管理</span>
+                    </a>
+                </div>
+
+                <!-- 一级菜单：租赁业务管理 -->
+                <div class="nav-item has-submenu" id="rentalMenu">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>租赁业务管理</span>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </div>
+                <div class="submenu" id="rentalSubmenu">
+                    <a class="submenu-item" data-target="tab-rental-create">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>租赁开单</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-rental-ship">
+                        <i class="fas fa-truck"></i>
+                        <span>订单发货管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-rental-active">
+                        <i class="fas fa-clock"></i>
+                        <span>在租订单管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-rental-follow">
+                        <i class="fas fa-comment"></i>
+                        <span>客户跟进管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-rental-return">
+                        <i class="fas fa-undo"></i>
+                        <span>归还结算管理</span>
+                    </a>
+                </div>
+
+                <!-- 一级菜单：经营数据中心 -->
+                <div class="nav-item has-submenu" id="dataMenu">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>经营数据中心</span>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </div>
+                <div class="submenu" id="dataSubmenu">
+                    <a class="submenu-item" data-target="tab-data-stat">
+                        <i class="fas fa-analytics"></i>
+                        <span>经营数据统计</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-data-order-export">
+                        <i class="fas fa-file-excel"></i>
+                        <span>订单数据导出</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-data-stock-export">
+                        <i class="fas fa-file-excel"></i>
+                        <span>资产数据导出</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-data-backup">
+                        <i class="fas fa-database"></i>
+                        <span>数据备份与还原</span>
+                    </a>
+                </div>
+
+                <!-- 一级菜单：系统基础设置 -->
+                <div class="nav-item has-submenu" id="settingsMenu">
+                    <i class="fas fa-cog"></i>
+                    <span>系统基础设置</span>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </div>
+                <div class="submenu" id="settingsSubmenu">
+                    <a class="submenu-item" data-target="tab-setting-game">
+                        <i class="fas fa-list"></i>
+                        <span>游戏名称库管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-setting-package">
+                        <i class="fas fa-box"></i>
+                        <span>租赁套餐管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-setting-source">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>订单来源管理</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-setting-stock">
+                        <i class="fas fa-warehouse"></i>
+                        <span>库存规则配置</span>
+                    </a>
+                    <a class="submenu-item" data-target="tab-setting-search">
+                        <i class="fas fa-search"></i>
+                        <span>搜索配置管理</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区域 - 所有Tab页面完整补全 -->
+        <main class="main-content">
+            <div class="top-header">
+                <div class="header-title"><h1 id="page-title">首页概览</h1></div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="quickBackupBtn"><i class="fas fa-download"></i> 一键备份</button>
+                    <button class="btn btn-secondary" id="quickRestoreBtn"><i class="fas fa-upload"></i> 数据还原</button>
+                </div>
+            </div>
+
+            <!-- Tab1 首页概览 -->
+            <div class="tab-content active" id="tab-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-header"><div><div class="stat-label">总订单数</div><div class="stat-value" id="totalOrders">0</div></div><div class="stat-icon primary"><i class="fas fa-file-invoice"></i></div></div></div>
+                    <div class="stat-card"><div class="stat-header"><div><div class="stat-label">待发货订单</div><div class="stat-value" id="pendingShipOrders">0</div></div><div class="stat-icon warning"><i class="fas fa-box"></i></div></div></div>
+                    <div class="stat-card"><div class="stat-header"><div><div class="stat-label">今日发货</div><div class="stat-value" id="todayShipOrders">0</div></div><div class="stat-icon success"><i class="fas fa-truck"></i></div></div></div>
+                    <div class="stat-card"><div class="stat-header"><div><div class="stat-label">在租订单</div><div class="stat-value" id="activeOrders">0</div></div><div class="stat-icon info"><i class="fas fa-clock"></i></div></div></div>
+                    <div class="stat-card"><div class="stat-header"><div><div class="stat-label">已完成订单</div><div class="stat-value" id="completedOrders">0</div></div><div class="stat-icon success"><i class="fas fa-check-circle"></i></div></div></div>
+                    <div class="stat-card"><div class="stat-header"><div><div class="stat-label">本日租金收入</div><div class="stat-value" id="todayRent">¥0</div></div><div class="stat-icon primary"><i class="fas fa-yen-sign"></i></div></div></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> 库龄预警统计</h3></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">一级预警(30天+)</div><div class="stat-value" id="warningLevel1">0</div></div><div class="stat-icon warning"><i class="fas fa-exclamation-circle"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">二级预警(60天+)</div><div class="stat-value" id="warningLevel2">0</div></div><div class="stat-icon warning"><i class="fas fa-exclamation-triangle"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">三级预警(90天+)</div><div class="stat-value" id="warningLevel3">0</div></div><div class="stat-icon danger"><i class="fas fa-times-circle"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">累计零售营收</div><div class="stat-value" id="totalSoldRevenue">¥0</div></div><div class="stat-icon success"><i class="fas fa-wallet"></i></div></div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-boxes"></i> 资产统计</h3></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">总卡带数量</div><div class="stat-value" id="totalCartridges">0</div></div><div class="stat-icon primary"><i class="fas fa-gamepad"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">可租卡带</div><div class="stat-value" id="availableCartridges">0</div></div><div class="stat-icon success"><i class="fas fa-check-circle"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">租赁中卡带</div><div class="stat-value" id="rentedCartridges">0</div></div><div class="stat-icon danger"><i class="fas fa-exchange-alt"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">总资产价值</div><div class="stat-value" id="totalAssetValue">¥0</div></div><div class="stat-icon primary"><i class="fas fa-wallet"></i></div></div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> 游戏型号出租率排行</h3></div>
+                    <div class="table-responsive"><table class="data-table" id="gameRankTable"><thead><tr><th>游戏名称</th><th>总数量</th><th>租赁中数量</th><th>出租率</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab2 卡带库存管理 -->
+            <div class="tab-content" id="tab-stock-list">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-box"></i> 卡带库存管理</h3>
+                        <div>
+                            <button class="btn btn-primary" id="addCartridgeBtn"><i class="fas fa-plus"></i> 新增卡带</button>
+                            <button class="btn btn-secondary" id="exportStockListBtn"><i class="fas fa-download"></i> 导出库存</button>
+                        </div>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" class="form-control" id="stockSearchInput" placeholder="搜索卡带编号、名称、版本、货架、采购来源">
+                        <select class="form-control" id="stockStatusFilter" style="max-width: 150px;"><option value="">全部状态</option><option value="可租">可租</option><option value="已占用">已占用</option><option value="租赁中">租赁中</option><option value="维修中">维修中</option><option value="已零售">已零售</option><option value="已报废">已报废</option></select>
+                        <select class="form-control" id="stockWarningFilter" style="max-width: 180px;"><option value="">全部预警等级</option><option value="1">一级预警(30天+)</option><option value="2">二级预警(60天+)</option><option value="3">三级预警(90天+)</option></select>
+                        <button class="btn btn-primary" id="stockSearchBtn"><i class="fas fa-search"></i> 搜索</button>
+                    </div>
+                    <div class="table-responsive"><table class="data-table" id="stockTable"><thead><tr><th>编号</th><th>游戏名称</th><th>版本</th><th>成色</th><th>总库龄(天)</th><th>连续闲置(天)</th><th>预警等级</th><th>入仓价</th><th>状态</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab3 卡带采购入库 -->
+            <div class="tab-content" id="tab-stock-in">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-download"></i> 卡带采购入库</h3></div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;"><i class="fas fa-plus"></i> 单条入库</h4></div>
+                        <form id="singleStockInForm">
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">卡带编号 <span style="color: var(--danger-color);">*</span></label><input type="text" class="form-control" id="inCartridgeCode" required></div>
+                                <div class="form-col"><label class="form-label">游戏名称 <span style="color: var(--danger-color);">*</span></label><input type="text" class="form-control" id="inCartridgeNameSearch" placeholder="输入游戏名称搜索" required><input type="hidden" id="inCartridgeName"><div class="dropdown-menu" id="inGameNameDropdown"></div></div>
+                                <div class="form-col"><label class="form-label">版本 <span style="color: var(--danger-color);">*</span></label><select class="form-control" id="inCartridgeVersion" required><option value="国行">国行</option><option value="日版">日版</option><option value="美版">美版</option><option value="港版">港版</option><option value="欧版">欧版</option><option value="其他">其他</option></select></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">成色 <span style="color: var(--danger-color);">*</span></label><select class="form-control" id="inCartridgeCondition" required><option value="全新">全新</option><option value="99新">99新</option><option value="95新">95新</option><option value="9新">9新</option><option value="8新">8新</option><option value="7新及以下">7新及以下</option></select></div>
+                                <div class="form-col"><label class="form-label">货架位置 <span style="color: var(--danger-color);">*</span></label><input type="text" class="form-control" id="inCartridgeShelf" required></div>
+                                <div class="form-col"><label class="form-label">入仓价 <span style="color: var(--danger-color);">*</span></label><input type="number" class="form-control" id="inCartridgePrice" min="0" step="0.01" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">采购来源</label><input type="text" class="form-control" id="inPurchaseSource" placeholder="如：拼多多、闲鱼、线下采购"></div>
+                                <div class="form-col"><label class="form-label">采购快递单号</label><input type="text" class="form-control" id="inPurchaseExpressNo" placeholder="输入采购快递单号"></div>
+                                <div class="form-col"><label class="form-label">采购入仓日期 <span style="color: var(--danger-color);">*</span></label><input type="date" class="form-control" id="inPurchaseDate" required></div>
+                            </div>
+                            <div class="form-row" style="justify-content: flex-end;"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> 确认入库</button></div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;"><i class="fas fa-list"></i> 批量入库</h4></div>
+                        <div class="form-group"><label class="form-label">批量入库模板</label><p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">格式：卡带编号,游戏名称,版本,成色,货架位置,入仓价,采购来源,采购快递单号（每行一条数据）</p><textarea class="form-control" id="batchStockInContent" rows="8" placeholder="示例：YD001,塞尔达传说：王国之泪,日版,99新,A-01,280,拼多多,YT1234567890"></textarea></div>
+                        <div class="form-row" style="justify-content: flex-end;"><button class="btn btn-primary" id="batchStockInBtn"><i class="fas fa-plus"></i> 批量入库</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab4 库龄预警管理 -->
+            <div class="tab-content" id="tab-stock-age">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt"></i> 库龄预警管理</h3><button class="btn btn-secondary" id="exportStockAgeBtn"><i class="fas fa-download"></i> 导出库龄报表</button></div>
+                    <div class="search-bar">
+                        <select class="form-control" id="ageWarningFilter" style="max-width: 180px;"><option value="">全部预警等级</option><option value="1">一级预警(30天+)</option><option value="2">二级预警(60天+)</option><option value="3">三级预警(90天+)</option></select>
+                        <input type="text" class="form-control" id="ageSearchInput" placeholder="搜索卡带编号、名称、版本">
+                        <button class="btn btn-primary" id="ageSearchBtn"><i class="fas fa-search"></i> 搜索</button>
+                    </div>
+                    <div class="table-responsive"><table class="data-table" id="stockAgeTable"><thead><tr><th>编号</th><th>游戏名称</th><th>版本</th><th>成色</th><th>采购入仓日期</th><th>总库龄(天)</th><th>连续闲置(天)</th><th>预警等级</th><th>入仓价</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab5 资产出库管理 -->
+            <div class="tab-content" id="tab-stock-out">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-upload"></i> 资产出库管理</h3></div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;"><i class="fas fa-plus"></i> 新增出库单</h4></div>
+                        <form id="stockOutForm">
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">出库类型 <span style="color: var(--danger-color);">*</span></label><select class="form-control" id="outType" required></select></div>
+                                <div class="form-col"><label class="form-label">出库日期 <span style="color: var(--danger-color);">*</span></label><input type="date" class="form-control" id="outDate" required></div>
+                                <div class="form-col"><label class="form-label">经办人 <span style="color: var(--danger-color);">*</span></label><input type="text" class="form-control" id="outOperator" required></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">选择出库卡带 <span style="color: var(--danger-color);">*</span></label>
+                                <div class="search-bar"><input type="text" class="form-control" id="outCartridgeSearch" placeholder="输入卡带编号/名称搜索可租卡带"><button class="btn btn-primary" id="outCartridgeSearchBtn"><i class="fas fa-search"></i> 搜索</button></div>
+                                <div class="table-responsive"><table class="data-table" id="outCartridgeTable"><thead><tr><th width="50">选择</th><th>卡带编号</th><th>游戏名称</th><th>版本</th><th>成色</th><th>入仓价</th></tr></thead><tbody></tbody></table></div>
+                            </div>
+                            <div class="form-row" id="soldAmountRow" style="display: none;">
+                                <div class="form-col"><label class="form-label">售卖总金额 <span style="color: var(--danger-color);">*</span></label><input type="number" class="form-control" id="outSoldAmount" min="0" step="0.01" placeholder="输入售卖总金额"></div>
+                                <div class="form-col"><label class="form-label">客户信息</label><input type="text" class="form-control" id="outCustomerInfo" placeholder="输入客户姓名/联系方式"></div>
+                                <div class="form-col"><label class="form-label">收款方式</label><select class="form-control" id="outPayType"><option value="微信">微信</option><option value="支付宝">支付宝</option><option value="银行卡">银行卡</option><option value="现金">现金</option><option value="其他">其他</option></select></div>
+                            </div>
+                            <div class="form-group"><label class="form-label">出库备注</label><textarea class="form-control" id="outRemark" rows="2" placeholder="输入出库备注信息"></textarea></div>
+                            <div class="form-row" style="justify-content: flex-end;"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> 确认出库</button></div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;"><i class="fas fa-list"></i> 历史出库单</h4><button class="btn btn-secondary" id="exportStockOutBtn"><i class="fas fa-download"></i> 导外出库单</button></div>
+                        <div class="search-bar"><input type="text" class="form-control" id="outOrderSearchInput" placeholder="搜索出库单号、经办人、客户信息"><select class="form-control" id="outTypeFilter" style="max-width: 150px;"><option value="">全部出库类型</option></select><button class="btn btn-primary" id="outOrderSearchBtn"><i class="fas fa-search"></i> 搜索</button></div>
+                        <div class="table-responsive"><table class="data-table" id="stockOutTable"><thead><tr><th>出库单号</th><th>出库类型</th><th>出库日期</th><th>出库卡带数量</th><th>售卖金额</th><th>经办人</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab6 租赁开单 -->
+            <div class="tab-content" id="tab-rental-create">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-plus-circle"></i> 租赁开单</h3></div>
+                    <form id="rentalOrderForm">
+                        <div class="form-row">
+                            <div class="form-col"><label class="form-label">客户姓名</label><input type="text" class="form-control" id="customerName" required></div>
+                            <div class="form-col"><label class="form-label">联系电话</label><input type="text" class="form-control" id="customerPhone" required></div>
+                            <div class="form-col"><label class="form-label">订单来源</label><select class="form-control" id="orderSource" required></select></div>
+                            <div class="form-col"><label class="form-label">平台订单号</label><input type="text" class="form-control" id="platformOrderNo"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">收货地址</label><textarea class="form-control" id="customerAddress" rows="2" placeholder="输入完整地址，系统将自动解析姓名和电话"></textarea></div>
+                        <div class="form-row">
+                            <div class="form-col"><label class="form-label">租赁套餐</label><select class="form-control" id="rentalPackage" required></select></div>
+                            <div class="form-col"><label class="form-label">租赁开始日期</label><input type="date" class="form-control" id="rentalStartDate" required></div>
+                            <div class="form-col"><label class="form-label">预计归还日期</label><input type="date" class="form-control" id="rentalEndDate" readonly></div>
+                        </div>
+                        <div class="card" style="margin: 20px 0; padding: 20px;">
+                            <div class="card-header"><h4 class="card-title" style="font-size: 16px;"><i class="fas fa-gamepad"></i> 租赁卡带列表</h4><button type="button" class="btn btn-primary btn-sm" id="addCartridgeItemBtn"><i class="fas fa-plus"></i> 添加卡带</button></div>
+                            <div id="cartridgeItemsContainer">
+                                <div class="form-row cartridge-item" data-index="0">
+                                    <div class="form-col" style="min-width: 300px;"><label class="form-label">卡带编号/名称</label><input type="text" class="form-control cartridge-search" data-index="0" placeholder="输入卡带编号或名称搜索" required><input type="hidden" class="cartridge-id" data-index="0"></div>
+                                    <div class="form-col"><label class="form-label">单份租金</label><input type="number" class="form-control unit-rent" data-index="0" readonly></div>
+                                    <div class="form-col"><label class="form-label">单份押金</label><input type="number" class="form-control unit-deposit" data-index="0" readonly></div>
+                                    <div class="form-col" style="max-width: 100px; align-self: flex-end;"><button type="button" class="btn btn-danger btn-sm remove-cartridge-btn" data-index="0"><i class="fas fa-trash"></i></button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col"><label class="form-label">总租金</label><input type="number" class="form-control" id="totalRent" readonly></div>
+                            <div class="form-col"><label class="form-label">总押金</label><input type="number" class="form-control" id="totalDeposit" readonly></div>
+                            <div class="form-col"><label class="form-label">应收总金额</label><input type="number" class="form-control" id="totalAmount" readonly></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">订单备注</label><textarea class="form-control" id="orderRemark" rows="2"></textarea></div>
+                        <div class="form-row" style="justify-content: flex-end;"><button type="submit" class="btn btn-primary" id="submitOrderBtn"><i class="fas fa-save"></i> 生成租赁订单</button></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab7 订单发货管理 -->
+            <div class="tab-content" id="tab-rental-ship">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-truck"></i> 订单发货管理</h3><button class="btn btn-secondary" id="exportShipOrdersBtn"><i class="fas fa-download"></i> 导出发货数据</button></div>
+                    <div class="search-bar"><input type="text" class="form-control" id="shipOrderSearchInput" placeholder="搜索订单号、客户姓名、电话、快递单号"><select class="form-control" id="shipOrderStatusFilter" style="max-width: 150px;"><option value="">全部状态</option><option value="待发货">待发货</option><option value="已发货">已发货</option><option value="已归还">已归还</option><option value="已完成">已完成</option></select><button class="btn btn-primary" id="shipOrderSearchBtn"><i class="fas fa-search"></i> 搜索</button></div>
+                    <div class="table-responsive"><table class="data-table" id="shipOrderTable"><thead><tr><th>订单号</th><th>客户姓名</th><th>联系电话</th><th>租赁卡带</th><th>租赁周期</th><th>到期日期</th><th>订单状态</th><th>快递单号</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab8 在租订单管理 -->
+            <div class="tab-content" id="tab-rental-active">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-clock"></i> 在租订单管理</h3></div>
+                    <div class="search-bar"><input type="text" class="form-control" id="activeOrderSearchInput" placeholder="搜索订单号、客户姓名、电话"><select class="form-control" id="activeOrderStatusFilter" style="max-width: 180px;"><option value="">全部状态</option><option value="正常">正常在租</option><option value="今日到期">今日到期</option><option value="即将到期">7天内到期</option><option value="已逾期">已逾期</option></select><button class="btn btn-primary" id="activeOrderSearchBtn"><i class="fas fa-search"></i> 搜索</button></div>
+                    <div class="table-responsive"><table class="data-table" id="activeOrderTable"><thead><tr><th>订单号</th><th>客户姓名</th><th>联系电话</th><th>租赁卡带</th><th>租赁开始日期</th><th>应归还日期</th><th>剩余/逾期天数</th><th>逾期费用</th><th>订单状态</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab9 客户跟进管理 -->
+            <div class="tab-content" id="tab-rental-follow">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-comment"></i> 客户跟进管理</h3></div>
+                    <div class="search-bar"><input type="text" class="form-control" id="followSearchInput" placeholder="搜索订单号、客户姓名、电话"><button class="btn btn-primary" id="followSearchBtn"><i class="fas fa-search"></i> 搜索</button></div>
+                    <div class="table-responsive"><table class="data-table" id="followTable"><thead><tr><th>订单号</th><th>客户姓名</th><th>联系电话</th><th>应归还日期</th><th>逾期天数</th><th>最新跟进时间</th><th>跟进次数</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab10 归还结算管理 -->
+            <div class="tab-content" id="tab-rental-return">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-undo"></i> 归还结算管理</h3></div>
+                    <div class="search-bar"><input type="text" class="form-control" id="returnSearchInput" placeholder="输入卡带编号或订单号搜索"><button class="btn btn-primary" id="returnSearchBtn"><i class="fas fa-search"></i> 搜索</button></div>
+                    <div id="returnOrderInfo" style="display: none;">
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title"><i class="fas fa-info-circle"></i> 租赁订单信息</h3></div>
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">订单号</label><input type="text" class="form-control" id="returnOrderNo" readonly></div>
+                                <div class="form-col"><label class="form-label">客户姓名</label><input type="text" class="form-control" id="returnCustomerName" readonly></div>
+                                <div class="form-col"><label class="form-label">联系电话</label><input type="text" class="form-control" id="returnCustomerPhone" readonly></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">租赁开始日期</label><input type="date" class="form-control" id="returnStartDate" readonly></div>
+                                <div class="form-col"><label class="form-label">应归还日期</label><input type="date" class="form-control" id="returnEndDate" readonly></div>
+                                <div class="form-col"><label class="form-label">实际归还日期</label><input type="date" class="form-control" id="actualReturnDate" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">逾期天数</label><input type="number" class="form-control" id="overdueDays" readonly></div>
+                                <div class="form-col"><label class="form-label">单日逾期费率</label><input type="number" class="form-control" id="overdueRate" readonly></div>
+                                <div class="form-col"><label class="form-label">逾期费用</label><input type="number" class="form-control" id="overdueFee" readonly></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">应退押金</label><input type="number" class="form-control" id="refundDeposit" readonly></div>
+                                <div class="form-col"><label class="form-label">实退押金</label><input type="number" class="form-control" id="actualRefundDeposit" required></div>
+                            </div>
+                            <div class="form-group"><label class="form-label">归还备注</label><textarea class="form-control" id="returnRemark" rows="2"></textarea></div>
+                            <div class="form-row" style="justify-content: flex-end;"><button class="btn btn-success" id="confirmReturnBtn"><i class="fas fa-check"></i> 确认归还结算</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab11 经营数据统计 -->
+            <div class="tab-content" id="tab-data-stat">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-bar"></i> 经营数据统计</h3></div>
+                    <div class="form-row">
+                        <div class="form-col"><label class="form-label">统计开始日期</label><input type="date" class="form-control" id="statStartDate"></div>
+                        <div class="form-col"><label class="form-label">统计结束日期</label><input type="date" class="form-control" id="statEndDate"></div>
+                        <div class="form-col" style="align-self: flex-end;"><button class="btn btn-primary" id="statQueryBtn"><i class="fas fa-search"></i> 查询统计</button></div>
+                    </div>
+                    <div class="stats-grid" style="margin-top: 20px;">
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">订单总数</div><div class="stat-value" id="statTotalOrders">0</div></div><div class="stat-icon primary"><i class="fas fa-file-invoice"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">租金总收入</div><div class="stat-value" id="statTotalRent">¥0</div></div><div class="stat-icon success"><i class="fas fa-yen-sign"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">逾期费总收入</div><div class="stat-value" id="statTotalOverdueFee">¥0</div></div><div class="stat-icon warning"><i class="fas fa-exclamation-triangle"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">零售总收入</div><div class="stat-value" id="statTotalSold">¥0</div></div><div class="stat-icon success"><i class="fas fa-shopping-cart"></i></div></div></div>
+                        <div class="stat-card"><div class="stat-header"><div><div class="stat-label">总营收</div><div class="stat-value" id="statTotalRevenue">¥0</div></div><div class="stat-icon primary"><i class="fas fa-wallet"></i></div></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> 月度经营汇总</h3></div>
+                        <div class="table-responsive"><table class="data-table" id="monthStatTable"><thead><tr><th>月份</th><th>订单数量</th><th>租金收入</th><th>逾期费收入</th><th>零售收入</th><th>总营收</th></tr></thead><tbody></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab12 订单数据导出 -->
+            <div class="tab-content" id="tab-data-order-export">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-file-excel"></i> 订单数据导出</h3></div>
+                    <div class="form-row">
+                        <div class="form-col"><label class="form-label">导出开始日期</label><input type="date" class="form-control" id="orderExportStartDate"></div>
+                        <div class="form-col"><label class="form-label">导出结束日期</label><input type="date" class="form-control" id="orderExportEndDate"></div>
+                        <div class="form-col"><label class="form-label">订单状态筛选</label><select class="form-control" id="orderExportStatusFilter"><option value="">全部状态</option><option value="待发货">待发货</option><option value="已发货">已发货</option><option value="已归还">已归还</option><option value="已完成">已完成</option><option value="已逾期">已逾期</option></select></div>
+                    </div>
+                    <div class="form-row" style="justify-content: flex-end;">
+                        <button class="btn btn-primary" id="exportOrderBtn"><i class="fas fa-download"></i> 导出筛选订单</button>
+                        <button class="btn btn-secondary" id="exportAllOrderBtn"><i class="fas fa-download"></i> 导出全部订单</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab13 资产数据导出 -->
+            <div class="tab-content" id="tab-data-stock-export">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-file-excel"></i> 资产数据导出</h3></div>
+                    <div class="form-row">
+                        <div class="form-col"><label class="form-label">卡带状态筛选</label><select class="form-control" id="stockExportStatusFilter"><option value="">全部状态</option><option value="可租">可租</option><option value="已占用">已占用</option><option value="租赁中">租赁中</option><option value="维修中">维修中</option><option value="已零售">已零售</option><option value="已报废">已报废</option></select></div>
+                        <div class="form-col"><label class="form-label">预警等级筛选</label><select class="form-control" id="stockExportWarningFilter"><option value="">全部预警等级</option><option value="1">一级预警(30天+)</option><option value="2">二级预警(60天+)</option><option value="3">三级预警(90天+)</option></select></div>
+                    </div>
+                    <div class="form-row" style="justify-content: flex-end;">
+                        <button class="btn btn-primary" id="exportStockBtn"><i class="fas fa-download"></i> 导出筛选卡带</button>
+                        <button class="btn btn-secondary" id="exportAllStockBtn"><i class="fas fa-download"></i> 导出全部卡带</button>
+                        <button class="btn btn-secondary" id="exportStockAgeReportBtn"><i class="fas fa-download"></i> 导出库龄报表</button>
+                        <button class="btn btn-secondary" id="exportStockOutReportBtn"><i class="fas fa-download"></i> 导外出库单报表</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab14 数据备份与还原 -->
+            <div class="tab-content" id="tab-data-backup">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-database"></i> 数据备份与还原</h3></div>
+                    <div class="form-row">
+                        <div class="form-col"><button class="btn btn-primary" id="backupAllDataBtn" style="width: 100%;"><i class="fas fa-download"></i> 全量数据备份</button></div>
+                        <div class="form-col"><input type="file" class="form-control" id="restoreFileInput" accept=".json"></div>
+                        <div class="form-col" style="align-self: flex-end;"><button class="btn btn-warning" id="restoreAllDataBtn"><i class="fas fa-upload"></i> 从文件还原数据</button></div>
+                    </div>
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;"><i class="fas fa-info-circle"></i> 备份说明</h4></div>
+                        <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+                            <p>1. 全量数据备份会导出所有数据，包括卡带库存、租赁订单、游戏名称库、套餐配置、出库单等所有系统数据</p>
+                            <p>2. 还原数据将覆盖当前系统的所有数据，请务必先备份当前数据，避免数据丢失</p>
+                            <p>3. 建议定期备份数据，防止浏览器缓存清理导致数据丢失</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab15 游戏名称库管理 -->
+            <div class="tab-content" id="tab-setting-game">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> 游戏名称库管理</h3></div>
+                    <div class="form-row">
+                        <div class="form-col"><label class="form-label">游戏名称</label><input type="text" class="form-control" id="gameNameInput" placeholder="输入游戏名称"></div>
+                        <div class="form-col" style="align-self: flex-end; max-width: 200px;"><button class="btn btn-primary" id="addGameNameBtn"><i class="fas fa-plus"></i> 添加游戏名称</button></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">批量导入游戏名称</label><textarea class="form-control" id="batchGameNamesInput" rows="3" placeholder="每行输入一个游戏名称，批量导入"></textarea></div>
+                    <div class="form-row" style="justify-content: flex-end;"><button class="btn btn-secondary" id="batchAddGameNamesBtn"><i class="fas fa-plus"></i> 批量导入</button></div>
+                    <div class="table-responsive" style="margin-top: 20px;"><table class="data-table" id="gameNameTable"><thead><tr><th>游戏名称</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab16 租赁套餐管理 -->
+            <div class="tab-content" id="tab-setting-package">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-box"></i> 租赁套餐管理</h3></div>
+                    <form id="rentalPackageForm">
+                        <div class="form-row">
+                            <div class="form-col"><label class="form-label">套餐名称</label><input type="text" class="form-control" id="packageName" placeholder="如：7天租赁" required></div>
+                            <div class="form-col"><label class="form-label">租赁天数</label><input type="number" class="form-control" id="packageDays" min="1" required></div>
+                            <div class="form-col"><label class="form-label">单份租金</label><input type="number" class="form-control" id="packageRent" min="0" step="0.01" required></div>
+                            <div class="form-col"><label class="form-label">单份押金</label><input type="number" class="form-control" id="packageDeposit" min="0" step="0.01" required></div>
+                            <div class="form-col"><label class="form-label">单日逾期费率</label><input type="number" class="form-control" id="packageOverdueRate" min="0" step="0.01" placeholder="如：5元/天" required></div>
+                        </div>
+                        <div class="form-row" style="justify-content: flex-end;"><button type="submit" class="btn btn-primary" id="savePackageBtn"><i class="fas fa-save"></i> 保存套餐</button></div>
+                    </form>
+                    <div class="table-responsive" style="margin-top: 20px;"><table class="data-table" id="packageTable"><thead><tr><th>套餐名称</th><th>租赁天数</th><th>单份租金</th><th>单份押金</th><th>单日逾期费率</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab17 订单来源管理 -->
+            <div class="tab-content" id="tab-setting-source">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-shopping-cart"></i> 订单来源管理</h3></div>
+                    <div class="form-row">
+                        <div class="form-col"><label class="form-label">来源名称</label><input type="text" class="form-control" id="sourceNameInput" placeholder="如：闲鱼、淘宝、拼多多"></div>
+                        <div class="form-col" style="align-self: flex-end; max-width: 200px;"><button class="btn btn-primary" id="addSourceBtn"><i class="fas fa-plus"></i> 添加来源</button></div>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 20px;"><table class="data-table" id="sourceTable"><thead><tr><th>来源名称</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- Tab18 库存规则配置 -->
+            <div class="tab-content" id="tab-setting-stock">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-warehouse"></i> 库存规则配置</h3></div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;">库龄预警阈值配置</h4></div>
+                        <form id="stockWarningConfigForm">
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">一级预警天数（黄色）</label><input type="number" class="form-control" id="warningLevel1Days" min="1" required></div>
+                                <div class="form-col"><label class="form-label">二级预警天数（橙色）</label><input type="number" class="form-control" id="warningLevel2Days" min="1" required></div>
+                                <div class="form-col"><label class="form-label">三级预警天数（红色）</label><input type="number" class="form-control" id="warningLevel3Days" min="1" required></div>
+                            </div>
+                            <div class="form-row" style="justify-content: flex-end;"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> 保存预警配置</button></div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="card-title" style="font-size: 16px;">出库类型管理</h4></div>
+                        <form id="outTypeConfigForm">
+                            <div class="form-row">
+                                <div class="form-col"><label class="form-label">出库类型名称</label><input type="text" class="form-control" id="outTypeName" placeholder="如：置换出库" required></div>
+                                <div class="form-col" style="max-width: 200px; align-self: flex-end;"><div class="form-check" style="margin: 0;"><input type="checkbox" id="outTypeNeedAmount"><label for="outTypeNeedAmount">需要填写售卖金额</label></div></div>
+                                <div class="form-col" style="align-self: flex-end; max-width: 200px;"><button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> 添加出库类型</button></div>
+                            </div>
+                        </form>
+                        <div class="table-responsive" style="margin-top: 20px;"><table class="data-table" id="outTypeTable"><thead><tr><th>出库类型名称</th><th>是否需要售卖金额</th><th>操作</th></tr></thead><tbody></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab19 搜索配置管理 -->
+            <div class="tab-content" id="tab-setting-search">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><i class="fas fa-search"></i> 搜索配置管理</h3></div>
+                    <div class="form-group">
+                        <label class="form-label">勾选启用的订单搜索字段</label>
+                        <div id="searchFieldsList">
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_orderNo" value="orderNo" checked><label for="searchField_orderNo">订单号</label></div>
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_platformOrderNo" value="platformOrderNo" checked><label for="searchField_platformOrderNo">平台订单号</label></div>
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_customerName" value="customerName" checked><label for="searchField_customerName">客户姓名</label></div>
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_customerPhone" value="customerPhone" checked><label for="searchField_customerPhone">联系电话</label></div>
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_expressNo" value="expressNo" checked><label for="searchField_expressNo">快递单号</label></div>
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_gameName" value="gameName" checked><label for="searchField_gameName">游戏名称</label></div>
+                            <div class="form-check"><input type="checkbox" class="search-field-checkbox" id="searchField_orderSource" value="orderSource" checked><label for="searchField_orderSource">订单来源</label></div>
+                        </div>
+                    </div>
+                    <div class="form-row" style="justify-content: flex-end;"><button class="btn btn-primary" id="saveSearchConfigBtn"><i class="fas fa-save"></i> 保存搜索配置</button></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 弹窗区域 -->
+    <!-- 新增/编辑卡带弹窗 -->
+    <div class="modal-overlay" id="cartridgeModal"><div class="modal"><div class="modal-header"><h3 class="modal-title" id="cartridgeModalTitle">新增卡带</h3><button class="modal-close" id="cartridgeModalClose"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="cartridgeForm"><input type="hidden" id="editCartridgeId"><div class="form-row"><div class="form-col"><label class="form-label">卡带编号</label><input type="text" class="form-control" id="cartridgeCode" required></div><div class="form-col"><label class="form-label">游戏名称</label><input type="text" class="form-control" id="cartridgeNameSearch" placeholder="输入游戏名称搜索" required><input type="hidden" id="cartridgeName"><div class="dropdown-menu" id="gameNameSearchDropdown"></div></div></div><div class="form-row"><div class="form-col"><label class="form-label">版本</label><select class="form-control" id="cartridgeVersion" required><option value="国行">国行</option><option value="日版">日版</option><option value="美版">美版</option><option value="港版">港版</option><option value="欧版">欧版</option><option value="其他">其他</option></select></div><div class="form-col"><label class="form-label">成色</label><select class="form-control" id="cartridgeCondition" required><option value="全新">全新</option><option value="99新">99新</option><option value="95新">95新</option><option value="9新">9新</option><option value="8新">8新</option><option value="7新及以下">7新及以下</option></select></div><div class="form-col"><label class="form-label">货架位置</label><input type="text" class="form-control" id="cartridgeShelf" required></div><div class="form-col"><label class="form-label">入仓价</label><input type="number" class="form-control" id="cartridgePrice" min="0" step="0.01" required></div></div><div class="form-row"><div class="form-col"><label class="form-label">采购来源</label><input type="text" class="form-control" id="cartridgePurchaseSource" placeholder="如：拼多多、闲鱼、线下采购"></div><div class="form-col"><label class="form-label">采购快递单号</label><input type="text" class="form-control" id="cartridgeExpressNo" placeholder="输入采购快递单号"></div><div class="form-col"><label class="form-label">采购入仓日期</label><input type="date" class="form-control" id="cartridgePurchaseDate" required></div><div class="form-col"><label class="form-label">卡带状态</label><select class="form-control" id="cartridgeStatus" required><option value="可租">可租</option><option value="已占用">已占用</option><option value="租赁中">租赁中</option><option value="维修中">维修中</option></select></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" id="cartridgeModalCancel">取消</button><button class="btn btn-primary" id="saveCartridgeBtn">保存</button></div></div></div>
+
+    <!-- 发货操作弹窗 -->
+    <div class="modal-overlay" id="shipModal"><div class="modal small-modal"><div class="modal-header"><h3 class="modal-title">订单发货操作</h3><button class="modal-close" id="shipModalClose"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="shipForm"><input type="hidden" id="shipOrderId"><div class="form-group"><label class="form-label">订单号</label><input type="text" class="form-control" id="shipOrderNo" readonly></div><div class="form-row"><div class="form-col"><label class="form-label">快递单号 <span style="color: var(--danger-color);">*</span></label><input type="text" class="form-control" id="shipExpressNo" placeholder="输入快递单号" required></div><div class="form-col"><label class="form-label">运费金额</label><input type="number" class="form-control" id="shipFreight" min="0" step="0.01" placeholder="输入运费金额（元）" value="0"></div></div><div class="form-group"><label class="form-label">发货备注</label><textarea class="form-control" id="shipRemark" rows="2" placeholder="输入发货备注信息（选填）"></textarea></div></form></div><div class="modal-footer"><button class="btn btn-secondary" id="shipModalCancel">取消</button><button class="btn btn-success" id="confirmShipBtn"><i class="fas fa-truck"></i> 确认发货</button></div></div></div>
+
+    <!-- 订单编辑弹窗 -->
+    <div class="modal-overlay" id="orderEditModal"><div class="modal"><div class="modal-header"><h3 class="modal-title">编辑订单信息</h3><button class="modal-close" id="orderEditModalClose"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="orderEditForm"><input type="hidden" id="editOrderId"><div class="form-row"><div class="form-col"><label class="form-label">平台订单号</label><input type="text" class="form-control" id="editPlatformOrderNo"></div><div class="form-col"><label class="form-label">订单来源</label><select class="form-control" id="editOrderSource"></select></div></div><div class="form-row"><div class="form-col"><label class="form-label">快递单号</label><input type="text" class="form-control" id="editExpressNo"></div><div class="form-col"><label class="form-label">订单状态</label><select class="form-control" id="editOrderStatus" required><option value="待发货">待发货</option><option value="已发货">已发货</option><option value="已归还">已归还</option><option value="已完成">已完成</option></select></div></div><div class="form-group"><label class="form-label">客户收货地址</label><textarea class="form-control" id="editCustomerAddress" rows="2"></textarea></div><div class="form-group"><label class="form-label">订单备注</label><textarea class="form-control" id="editOrderRemark" rows="2"></textarea></div></form></div><div class="modal-footer"><button class="btn btn-secondary" id="orderEditModalCancel">取消</button><button class="btn btn-primary" id="saveOrderEditBtn">保存修改</button></div></div></div>
+
+    <!-- 跟进记录弹窗 -->
+    <div class="modal-overlay" id="followModal"><div class="modal"><div class="modal-header"><h3 class="modal-title">客户跟进记录</h3><button class="modal-close" id="followModalClose"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="followForm"><input type="hidden" id="followOrderId"><div class="form-group"><label class="form-label">跟进内容</label><textarea class="form-control" id="followContent" rows="3" placeholder="输入跟进内容，如：已电话提醒客户归还" required></textarea></div><div class="form-row"><div class="form-col"><label class="form-label">跟进人</label><input type="text" class="form-control" id="followUser" placeholder="输入跟进人姓名"></div><div class="form-col"><label class="form-label">跟进时间</label><input type="datetime-local" class="form-control" id="followTime" required></div></div></form><div class="card" style="margin-top: 20px;"><div class="card-header"><h4 class="card-title" style="font-size: 16px;">历史跟进记录</h4></div><div id="followRecordList"></div></div></div><div class="modal-footer"><button class="btn btn-secondary" id="followModalCancel">取消</button><button class="btn btn-primary" id="saveFollowBtn">保存跟进记录</button></div></div></div>
+
+    <!-- 出库单详情弹窗 -->
+    <div class="modal-overlay" id="stockOutDetailModal"><div class="modal"><div class="modal-header"><h3 class="modal-title">出库单详情</h3><button class="modal-close" id="stockOutDetailModalClose"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-row"><div class="form-col"><label class="form-label">出库单号</label><input type="text" class="form-control" id="detailOutNo" readonly></div><div class="form-col"><label class="form-label">出库类型</label><input type="text" class="form-control" id="detailOutType" readonly></div><div class="form-col"><label class="form-label">出库日期</label><input type="date" class="form-control" id="detailOutDate" readonly></div></div><div class="form-row"><div class="form-col"><label class="form-label">经办人</label><input type="text" class="form-control" id="detailOperator" readonly></div><div class="form-col"><label class="form-label">售卖金额</label><input type="text" class="form-control" id="detailSoldAmount" readonly></div><div class="form-col"><label class="form-label">客户信息</label><input type="text" class="form-control" id="detailCustomerInfo" readonly></div></div><div class="form-group"><label class="form-label">出库备注</label><textarea class="form-control" id="detailRemark" rows="2" readonly></textarea></div><div class="card"><div class="card-header"><h4 class="card-title" style="font-size: 16px;">出库卡带明细</h4></div><div class="table-responsive"><table class="data-table" id="detailCartridgeTable"><thead><tr><th>卡带编号</th><th>游戏名称</th><th>版本</th><th>成色</th><th>入仓价</th></tr></thead><tbody></tbody></table></div></div></div><div class="modal-footer"><button class="btn btn-secondary" id="stockOutDetailModalCancel">关闭</button></div></div></div>
+
+    <!-- 卡带搜索下拉菜单 -->
+    <div class="dropdown-menu" id="cartridgeSearchDropdown"></div>
+
+    <script>
+        // ===================== 全局数据定义 100%历史数据兼容 =====================
+        // 原有核心数据 - 完全保留
+        let gameCartridges = JSON.parse(localStorage.getItem('gameCartridges')) || [];
+        let rentalOrders = JSON.parse(localStorage.getItem('rentalOrders')) || [];
+        let gameNames = JSON.parse(localStorage.getItem('gameNames')) || ['塞尔达传说：王国之泪', '马里奥惊奇', '宝可梦：朱紫', '塞尔达传说：旷野之息', '马里奥赛车8', '任天堂明星大乱斗', '喷射战士3', '皮克敏4', '超级马里奥兄弟：惊奇', '星露谷物语'];
+        let rentalPackages = JSON.parse(localStorage.getItem('rentalPackages')) || [{ id: 1, name: '7天租赁', days: 7, rent: 35, deposit: 300, overdueRate: 5 }, { id: 2, name: '15天租赁', days: 15, rent: 50, deposit: 300, overdueRate: 5 }, { id: 3, name: '30天租赁', days: 30, rent: 70, deposit: 300, overdueRate: 5 }];
+        let orderSources = JSON.parse(localStorage.getItem('orderSources')) || ['闲鱼', '淘宝', '拼多多', '抖音', '微信私域', '线下门店'];
+        let searchConfig = JSON.parse(localStorage.getItem('searchConfig')) || ['orderNo', 'platformOrderNo', 'customerName', 'customerPhone', 'expressNo', 'gameName', 'orderSource'];
+        
+        // 新增数据 - 与原有数据隔离
+        let stockOutOrders = JSON.parse(localStorage.getItem('stockOutOrders')) || [];
+        let stockConfig = JSON.parse(localStorage.getItem('stockConfig')) || {
+            warningLevel1: 30, warningLevel2: 60, warningLevel3: 90,
+            outTypes: [
+                { id: 1, name: '零售出库', needAmount: true },
+                { id: 2, name: '报废出库', needAmount: false },
+                { id: 3, name: '赠送出库', needAmount: false },
+                { id: 4, name: '损耗出库', needAmount: false },
+                { id: 5, name: '置换出库', needAmount: false }
+            ]
+        };
+
+        // ===================== 历史数据兼容处理 =====================
+        function initOldCartridgeData() {
+            const today = getToday();
+            gameCartridges = gameCartridges.map(cartridge => {
+                let purchaseDate = cartridge.purchaseDate || today;
+                if (!cartridge.purchaseDate) {
+                    const order = rentalOrders.find(o => o.cartridges.some(c => c.cartridgeId === cartridge.id));
+                    if (order) purchaseDate = order.createTime.split('T')[0];
+                }
+                let lastAvailableDate = cartridge.lastAvailableDate || today;
+                if (!cartridge.lastAvailableDate && cartridge.status === '可租') lastAvailableDate = today;
+                return { ...cartridge, purchaseDate, lastAvailableDate };
+            });
+            saveData();
+        }
+
+        // ===================== 通用工具函数 =====================
+        function getToday() { return new Date().toISOString().split('T')[0]; }
+        function addDays(date, days) { const result = new Date(date); result.setDate(result.getDate() + days); return result.toISOString().split('T')[0]; }
+        function getDaysBetween(startDate, endDate) { const start = new Date(startDate); const end = new Date(endDate); const diffTime = end - start; return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); }
+        function generateId() { return Date.now() + Math.random().toString(36).substr(2, 9); }
+        function generateOrderNo() { const d = new Date(); return `YD${d.getFullYear().toString().slice(-2)}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}${Math.floor(Math.random()*10000).toString().padStart(4,'0')}`; }
+        function generateStockOutNo() { const d = new Date(); return `CK${d.getFullYear().toString().slice(-2)}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}${Math.floor(Math.random()*10000).toString().padStart(4,'0')}`; }
+        function saveData() {
+            localStorage.setItem('gameCartridges', JSON.stringify(gameCartridges));
+            localStorage.setItem('rentalOrders', JSON.stringify(rentalOrders));
+            localStorage.setItem('gameNames', JSON.stringify(gameNames));
+            localStorage.setItem('rentalPackages', JSON.stringify(rentalPackages));
+            localStorage.setItem('orderSources', JSON.stringify(orderSources));
+            localStorage.setItem('searchConfig', JSON.stringify(searchConfig));
+            localStorage.setItem('stockOutOrders', JSON.stringify(stockOutOrders));
+            localStorage.setItem('stockConfig', JSON.stringify(stockConfig));
+        }
+
+        // 库龄计算
+        function calculateStockAge(cartridge) {
+            const today = getToday();
+            const totalAge = getDaysBetween(cartridge.purchaseDate, today);
+            let idleAge = 0;
+            if (cartridge.status === '可租') idleAge = getDaysBetween(cartridge.lastAvailableDate, today);
+            let warningLevel = 0;
+            if (idleAge >= stockConfig.warningLevel3) warningLevel = 3;
+            else if (idleAge >= stockConfig.warningLevel2) warningLevel = 2;
+            else if (idleAge >= stockConfig.warningLevel1) warningLevel = 1;
+            return { totalAge, idleAge, warningLevel };
+        }
+
+        // 状态徽章
+        function getStatusBadge(status) {
+            const badgeMap = {
+                '可租': '<span class="status-badge status-available">可租</span>',
+                '已占用': '<span class="status-badge status-occupied">已占用</span>',
+                '租赁中': '<span class="status-badge status-rented">租赁中</span>',
+                '维修中': '<span class="status-badge status-repair">维修中</span>',
+                '待发货': '<span class="status-badge status-occupied">待发货</span>',
+                '已发货': '<span class="status-badge status-shipping">已发货</span>',
+                '已归还': '<span class="status-badge status-info">已归还</span>',
+                '已完成': '<span class="status-badge status-success">已完成</span>',
+                '已逾期': '<span class="status-badge status-overdue">已逾期</span>',
+                '已零售': '<span class="status-badge status-out-sold">已零售</span>',
+                '已报废': '<span class="status-badge status-out-scrap">已报废</span>'
+            };
+            return badgeMap[status] || '<span class="status-badge">未知</span>';
+        }
+
+        function getWarningBadge(level) {
+            const badgeMap = {
+                1: '<span class="status-badge status-warning-1">一级预警</span>',
+                2: '<span class="status-badge status-warning-2">二级预警</span>',
+                3: '<span class="status-badge status-warning-3">三级预警</span>'
+            };
+            return badgeMap[level] || '<span class="status-badge">无预警</span>';
+        }
+
+        // 导出Excel通用函数
+        function exportToExcel(data, filename, headers) {
+            let csvContent = headers.join(',') + '\n';
+            data.forEach(row => {
+                const formattedRow = row.map(cell => `"${String(cell).replace(/"/g, '""')}"`);
+                csvContent += formattedRow.join(',') + '\n';
+            });
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filename}_${getToday().replace(/-/g,'')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 数据备份与还原
+        function backupAllData() {
+            const data = { gameCartridges, rentalOrders, gameNames, rentalPackages, orderSources, searchConfig, stockOutOrders, stockConfig, backupTime: new Date().toLocaleString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `椰子电玩ERP全量备份_${getToday().replace(/-/g,'')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ===================== 导航菜单切换 =====================
+        document.querySelectorAll('.nav-item.has-submenu').forEach(item => {
+            item.addEventListener('click', function() {
+                const submenuId = this.id.replace('Menu', 'Submenu');
+                const submenu = document.getElementById(submenuId);
+                const arrow = this.querySelector('.submenu-arrow');
+                const isActive = submenu.classList.contains('active');
+                document.querySelectorAll('.submenu').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.nav-item.has-submenu .submenu-arrow').forEach(a => a.style.transform = 'rotate(0)');
+                if (!isActive) { submenu.classList.add('active'); arrow.style.transform = 'rotate(180deg)'; }
+            });
+        });
+
+        document.querySelectorAll('.submenu-item, .nav-item[data-target]').forEach(item => {
+            item.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                if (!targetId) return;
+                document.querySelectorAll('.nav-item, .submenu-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                const targetTab = document.getElementById(targetId);
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                    document.getElementById('page-title').textContent = this.querySelector('span').textContent;
+                }
+            });
+        });
+
+        // ===================== 下拉选项初始化 =====================
+        function initRentalPackageSelect() {
+            const select = document.getElementById('rentalPackage');
+            select.innerHTML = '';
+            rentalPackages.forEach(pkg => {
+                const option = document.createElement('option');
+                option.value = pkg.id;
+                option.textContent = pkg.name;
+                option.dataset.days = pkg.days;
+                option.dataset.rent = pkg.rent;
+                option.dataset.deposit = pkg.deposit;
+                option.dataset.overdueRate = pkg.overdueRate;
+                select.appendChild(option);
+            });
+            if (select.options.length > 0) select.dispatchEvent(new Event('change'));
+        }
+
+        function initOrderSourceSelect() {
+            const select = document.getElementById('orderSource');
+            const editSelect = document.getElementById('editOrderSource');
+            select.innerHTML = ''; editSelect.innerHTML = '';
+            orderSources.forEach(source => {
+                select.appendChild(new Option(source, source));
+                editSelect.appendChild(new Option(source, source));
+            });
+        }
+
+        function initOutTypeSelect() {
+            const select = document.getElementById('outType');
+            const filterSelect = document.getElementById('outTypeFilter');
+            select.innerHTML = ''; filterSelect.innerHTML = '<option value="">全部出库类型</option>';
+            stockConfig.outTypes.forEach(type => {
+                select.appendChild(new Option(type.name, type.id));
+                filterSelect.appendChild(new Option(type.name, type.id));
+            });
+            renderOutTypeTable();
+        }
+
+        function getCurrentPackageFee() {
+            const select = document.getElementById('rentalPackage');
+            const option = select.options[select.selectedIndex];
+            return { rent: option?.dataset.rent || 0, deposit: option?.dataset.deposit || 0, overdueRate: option?.dataset.overdueRate || 0 };
+        }
+
+        // ===================== 全局下拉框事件 =====================
+        const cartridgeDropdown = document.getElementById('cartridgeSearchDropdown');
+        cartridgeDropdown.addEventListener('click', function(e) {
+            const item = e.target.closest('.dropdown-item');
+            if (item) {
+                e.stopPropagation();
+                const activeIndex = this.dataset.activeIndex;
+                const searchInput = document.querySelector(`.cartridge-search[data-index="${activeIndex}"]`);
+                const idInput = document.querySelector(`.cartridge-id[data-index="${activeIndex}"]`);
+                const rentInput = document.querySelector(`.unit-rent[data-index="${activeIndex}"]`);
+                const depositInput = document.querySelector(`.unit-deposit[data-index="${activeIndex}"]`);
+                if (searchInput && idInput) {
+                    searchInput.value = item.textContent;
+                    idInput.value = item.dataset.id;
+                    const { rent, deposit } = getCurrentPackageFee();
+                    if (rentInput) rentInput.value = rent;
+                    if (depositInput) depositInput.value = deposit;
+                    calculateTotalAmount();
+                }
+                this.classList.remove('active');
+                this.dataset.activeIndex = '';
+            }
+        });
+
+        const gameNameDropdowns = [document.getElementById('gameNameSearchDropdown'), document.getElementById('inGameNameDropdown')];
+        gameNameDropdowns.forEach(dropdown => {
+            dropdown.addEventListener('click', function(e) {
+                const item = e.target.closest('.dropdown-item');
+                if (item) {
+                    e.stopPropagation();
+                    const inputId = this.dataset.inputId;
+                    const hiddenId = this.dataset.hiddenId;
+                    const searchInput = document.getElementById(inputId);
+                    const hiddenInput = document.getElementById(hiddenId);
+                    if (searchInput && hiddenInput) {
+                        searchInput.value = item.dataset.name;
+                        hiddenInput.value = item.dataset.name;
+                    }
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('cartridge-search') && !cartridgeDropdown.contains(e.target)) {
+                cartridgeDropdown.classList.remove('active');
+                cartridgeDropdown.dataset.activeIndex = '';
+            }
+            gameNameDropdowns.forEach(dropdown => {
+                const inputId = dropdown.dataset.inputId;
+                if (!e.target.id.includes(inputId) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+
+        function bindGameNameSearchEvents() {
+            document.getElementById('cartridgeNameSearch').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const dropdown = document.getElementById('gameNameSearchDropdown');
+                dropdown.dataset.inputId = 'cartridgeNameSearch';
+                dropdown.dataset.hiddenId = 'cartridgeName';
+                if (query.length < 1) { dropdown.classList.remove('active'); return; }
+                const matched = gameNames.filter(name => name.toLowerCase().includes(query));
+                dropdown.innerHTML = matched.map(name => `<div class="dropdown-item" data-name="${name}">${name}</div>`).join('');
+                if (matched.length > 0) {
+                    const rect = this.getBoundingClientRect();
+                    dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+                    dropdown.style.left = `${rect.left + window.scrollX}px`;
+                    dropdown.style.width = `${rect.width}px`;
+                    dropdown.classList.add('active');
+                } else { dropdown.classList.remove('active'); }
+            });
+
+            document.getElementById('inCartridgeNameSearch').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const dropdown = document.getElementById('inGameNameDropdown');
+                dropdown.dataset.inputId = 'inCartridgeNameSearch';
+                dropdown.dataset.hiddenId = 'inCartridgeName';
+                if (query.length < 1) { dropdown.classList.remove('active'); return; }
+                const matched = gameNames.filter(name => name.toLowerCase().includes(query));
+                dropdown.innerHTML = matched.map(name => `<div class="dropdown-item" data-name="${name}">${name}</div>`).join('');
+                if (matched.length > 0) {
+                    const rect = this.getBoundingClientRect();
+                    dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+                    dropdown.style.left = `${rect.left + window.scrollX}px`;
+                    dropdown.style.width = `${rect.width}px`;
+                    dropdown.classList.add('active');
+                } else { dropdown.classList.remove('active'); }
+            });
+        }
+
+        // ===================== 租赁开单核心逻辑 =====================
+        document.getElementById('customerAddress').addEventListener('blur', function() {
+            const address = this.value.trim();
+            if (!address) return;
+            const phoneMatch = address.match(/1[3-9]\d{9}/);
+            const customerPhone = phoneMatch ? phoneMatch[0] : '';
+            let customerName = '';
+            const addressKeywords = ['省','市','区','县','街道','镇','乡','路','巷','弄','号','小区','园','苑','公寓','花园','栋','楼','单元','层','室','房','村','组','大道','街','广场'];
+            if (phoneMatch) {
+                const phoneIndex = address.indexOf(customerPhone);
+                const beforePhone = address.slice(0, phoneIndex).trim();
+                const afterPhone = address.slice(phoneIndex + 11).trim();
+                if (beforePhone) {
+                    const nameCandidates = beforePhone.match(/[\u4e00-\u9fa5]{2,4}/g);
+                    if (nameCandidates) {
+                        for (let i = nameCandidates.length - 1; i >= 0; i--) {
+                            const candidate = nameCandidates[i];
+                            if (!addressKeywords.some(keyword => candidate.includes(keyword))) {
+                                customerName = candidate;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!customerName && afterPhone) {
+                    const nameCandidates = afterPhone.match(/[\u4e00-\u9fa5]{2,4}/g);
+                    if (nameCandidates) {
+                        for (let i = 0; i < nameCandidates.length; i++) {
+                            const candidate = nameCandidates[i];
+                            if (!addressKeywords.some(keyword => candidate.includes(keyword))) {
+                                customerName = candidate;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            const nameInput = document.getElementById('customerName');
+            const phoneInput = document.getElementById('customerPhone');
+            if (customerName && !nameInput.value) nameInput.value = customerName;
+            if (customerPhone && !phoneInput.value) phoneInput.value = customerPhone;
+        });
+
+        document.getElementById('rentalPackage').addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            const days = option.dataset.days;
+            const startDate = document.getElementById('rentalStartDate').value;
+            if (startDate) document.getElementById('rentalEndDate').value = addDays(startDate, Number(days));
+            const { rent, deposit } = getCurrentPackageFee();
+            document.querySelectorAll('.unit-rent').forEach(input => input.value = rent);
+            document.querySelectorAll('.unit-deposit').forEach(input => input.value = deposit);
+            calculateTotalAmount();
+        });
+
+        document.getElementById('rentalStartDate').addEventListener('change', function() {
+            const option = document.getElementById('rentalPackage').options[document.getElementById('rentalPackage').selectedIndex];
+            const days = option.dataset.days;
+            const startDate = this.value;
+            if (startDate && days) document.getElementById('rentalEndDate').value = addDays(startDate, Number(days));
+        });
+
+        document.getElementById('addCartridgeItemBtn').addEventListener('click', function() {
+            const container = document.getElementById('cartridgeItemsContainer');
+            const index = container.children.length;
+            const { rent, deposit } = getCurrentPackageFee();
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'form-row cartridge-item';
+            itemDiv.dataset.index = index;
+            itemDiv.innerHTML = `
+                <div class="form-col" style="min-width: 300px;"><label class="form-label">卡带编号/名称</label><input type="text" class="form-control cartridge-search" data-index="${index}" placeholder="输入卡带编号或名称搜索" required><input type="hidden" class="cartridge-id" data-index="${index}"></div>
+                <div class="form-col"><label class="form-label">单份租金</label><input type="number" class="form-control unit-rent" data-index="${index}" value="${rent}" readonly></div>
+                <div class="form-col"><label class="form-label">单份押金</label><input type="number" class="form-control unit-deposit" data-index="${index}" value="${deposit}" readonly></div>
+                <div class="form-col" style="max-width: 100px; align-self: flex-end;"><button type="button" class="btn btn-danger btn-sm remove-cartridge-btn" data-index="${index}"><i class="fas fa-trash"></i></button></div>
+            `;
+            container.appendChild(itemDiv);
+            bindCartridgeItemEvents(index);
+            calculateTotalAmount();
+        });
+
+        function bindCartridgeItemEvents(index) {
+            const searchInput = document.querySelector(`.cartridge-search[data-index="${index}"]`);
+            const dropdown = document.getElementById('cartridgeSearchDropdown');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                dropdown.dataset.activeIndex = index;
+                if (query.length < 2) { dropdown.classList.remove('active'); return; }
+                const matched = gameCartridges.filter(c => c.status === '可租' && (c.code.toLowerCase().includes(query) || c.name.toLowerCase().includes(query)));
+                dropdown.innerHTML = matched.map(c => `<div class="dropdown-item" data-id="${c.id}">${c.code} - ${c.name} (${c.version})</div>`).join('');
+                if (matched.length > 0) {
+                    const rect = searchInput.getBoundingClientRect();
+                    dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+                    dropdown.style.left = `${rect.left + window.scrollX}px`;
+                    dropdown.style.width = `${rect.width}px`;
+                    dropdown.classList.add('active');
+                } else { dropdown.classList.remove('active'); }
+            });
+            document.querySelector(`.remove-cartridge-btn[data-index="${index}"]`).addEventListener('click', function() {
+                document.querySelector(`.cartridge-item[data-index="${index}"]`).remove();
+                calculateTotalAmount();
+            });
+        }
+
+        function calculateTotalAmount() {
+            const rentInputs = document.querySelectorAll('.unit-rent');
+            const depositInputs = document.querySelectorAll('.unit-deposit');
+            let totalRent = 0, totalDeposit = 0;
+            rentInputs.forEach(input => totalRent += Number(input.value || 0));
+            depositInputs.forEach(input => totalDeposit += Number(input.value || 0));
+            document.getElementById('totalRent').value = totalRent;
+            document.getElementById('totalDeposit').value = totalDeposit;
+            document.getElementById('totalAmount').value = totalRent + totalDeposit;
+        }
+
+        document.getElementById('rentalOrderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const orderSource = document.getElementById('orderSource').value;
+            const platformOrderNo = document.getElementById('platformOrderNo').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            const rentalStartDate = document.getElementById('rentalStartDate').value;
+            const rentalEndDate = document.getElementById('rentalEndDate').value;
+            const totalRent = document.getElementById('totalRent').value;
+            const totalDeposit = document.getElementById('totalDeposit').value;
+            const orderRemark = document.getElementById('orderRemark').value;
+            const packageId = document.getElementById('rentalPackage').value;
+            const selectedPackage = rentalPackages.find(p => p.id == packageId);
+            const cartridgeItems = document.querySelectorAll('.cartridge-item');
+            const cartridges = [];
+            cartridgeItems.forEach(item => {
+                const index = item.dataset.index;
+                const cartridgeId = document.querySelector(`.cartridge-id[data-index="${index}"]`).value;
+                const cartridgeInfo = document.querySelector(`.cartridge-search[data-index="${index}"]`).value;
+                const unitRent = document.querySelector(`.unit-rent[data-index="${index}"]`).value;
+                const unitDeposit = document.querySelector(`.unit-deposit[data-index="${index}"]`).value;
+                if (!cartridgeId) { alert('请选择有效的卡带！'); throw new Error('无效卡带'); }
+                cartridges.push({ cartridgeId, cartridgeInfo, unitRent, unitDeposit });
+            });
+            if (cartridges.length === 0) { alert('请至少添加一个租赁卡带！'); return; }
+            const orderNo = generateOrderNo();
+            const newOrder = {
+                id: generateId(), orderNo, platformOrderNo, orderSource, customerName, customerPhone, customerAddress,
+                rentalStartDate, rentalEndDate, rentalPackage: selectedPackage, cartridges, totalRent, totalDeposit,
+                totalAmount: Number(totalRent) + Number(totalDeposit), status: '待发货', orderRemark,
+                createTime: new Date().toISOString(), followRecords: []
+            };
+            cartridges.forEach(item => {
+                const index = gameCartridges.findIndex(c => c.id === item.cartridgeId);
+                if (index > -1) gameCartridges[index].status = '已占用';
+            });
+            rentalOrders.push(newOrder);
+            saveData();
+            this.reset();
+            document.getElementById('cartridgeItemsContainer').innerHTML = `
+                <div class="form-row cartridge-item" data-index="0">
+                    <div class="form-col" style="min-width: 300px;"><label class="form-label">卡带编号/名称</label><input type="text" class="form-control cartridge-search" data-index="0" placeholder="输入卡带编号或名称搜索" required><input type="hidden" class="cartridge-id" data-index="0"></div>
+                    <div class="form-col"><label class="form-label">单份租金</label><input type="number" class="form-control unit-rent" data-index="0" readonly></div>
+                    <div class="form-col"><label class="form-label">单份押金</label><input type="number" class="form-control unit-deposit" data-index="0" readonly></div>
+                    <div class="form-col" style="max-width: 100px; align-self: flex-end;"><button type="button" class="btn btn-danger btn-sm remove-cartridge-btn" data-index="0"><i class="fas fa-trash"></i></button></div>
+                </div>
+            `;
+            bindCartridgeItemEvents(0);
+            initRentalPackageSelect();
+            alert(`订单创建成功！订单号：${orderNo}`);
+            renderAllPage();
+        });
+
+        // ===================== 发货管理逻辑 =====================
+        document.getElementById('confirmShipBtn').addEventListener('click', function() {
+            const orderId = document.getElementById('shipOrderId').value;
+            const expressNo = document.getElementById('shipExpressNo').value.trim();
+            const freight = document.getElementById('shipFreight').value;
+            const shipRemark = document.getElementById('shipRemark').value;
+            if (!expressNo) { alert('请输入快递单号！'); return; }
+            if (confirm('确定要标记该订单为已发货吗？')) {
+                const orderIndex = rentalOrders.findIndex(o => o.id === orderId);
+                if (orderIndex > -1) {
+                    rentalOrders[orderIndex].status = '已发货';
+                    rentalOrders[orderIndex].shipDate = getToday();
+                    rentalOrders[orderIndex].expressNo = expressNo;
+                    rentalOrders[orderIndex].freight = freight;
+                    rentalOrders[orderIndex].shipRemark = shipRemark;
+                    rentalOrders[orderIndex].cartridges.forEach(item => {
+                        const cartridgeIndex = gameCartridges.findIndex(c => c.id === item.cartridgeId);
+                        if (cartridgeIndex > -1) gameCartridges[cartridgeIndex].status = '租赁中';
+                    });
+                    saveData();
+                    document.getElementById('shipModal').classList.remove('active');
+                    renderAllPage();
+                    alert('发货操作完成！');
+                }
+            }
+        });
+
+        // ===================== 归还结算逻辑 =====================
+        document.getElementById('returnSearchBtn').addEventListener('click', function() {
+            const query = document.getElementById('returnSearchInput').value.trim();
+            if (!query) { alert('请输入卡带编号或订单号！'); return; }
+            let order = rentalOrders.find(o => o.orderNo === query && (o.status === '已发货' || o.status === '已逾期'));
+            if (!order) {
+                order = rentalOrders.find(o => (o.status === '已发货' || o.status === '已逾期') && o.cartridges.some(c => {
+                    const cartridge = gameCartridges.find(gc => gc.id === c.cartridgeId);
+                    return cartridge && cartridge.code === query;
+                }));
+            }
+            if (!order) { alert('未找到对应的租赁订单，或订单状态不符合归还条件！'); document.getElementById('returnOrderInfo').style.display = 'none'; return; }
+            document.getElementById('returnOrderNo').value = order.orderNo;
+            document.getElementById('returnCustomerName').value = order.customerName;
+            document.getElementById('returnCustomerPhone').value = order.customerPhone;
+            document.getElementById('returnStartDate').value = order.rentalStartDate;
+            document.getElementById('returnEndDate').value = order.rentalEndDate;
+            document.getElementById('actualReturnDate').value = getToday();
+            document.getElementById('overdueRate').value = order.rentalPackage.overdueRate;
+            document.getElementById('returnOrderInfo').dataset.totalDeposit = order.totalDeposit;
+            calculateOverdueInfo();
+            document.getElementById('returnOrderInfo').style.display = 'block';
+        });
+
+        document.getElementById('actualReturnDate').addEventListener('change', calculateOverdueInfo);
+
+        function calculateOverdueInfo() {
+            const endDate = document.getElementById('returnEndDate').value;
+            const actualReturnDate = document.getElementById('actualReturnDate').value;
+            const overdueRate = Number(document.getElementById('overdueRate').value);
+            const totalDeposit = Number(document.getElementById('returnOrderInfo').dataset.totalDeposit || 0);
+            const daysBetween = getDaysBetween(endDate, actualReturnDate);
+            const overdueDays = daysBetween > 0 ? daysBetween : 0;
+            const overdueFee = overdueDays * overdueRate;
+            const refundDeposit = totalDeposit - overdueFee;
+            document.getElementById('overdueDays').value = overdueDays;
+            document.getElementById('overdueFee').value = overdueFee.toFixed(2);
+            document.getElementById('refundDeposit').value = refundDeposit > 0 ? refundDeposit.toFixed(2) : 0;
+            document.getElementById('actualRefundDeposit').value = refundDeposit > 0 ? refundDeposit.toFixed(2) : 0;
+        }
+
+        document.getElementById('confirmReturnBtn').addEventListener('click', function() {
+            if (confirm('确定要完成归还结算吗？此操作将更新卡带状态和订单状态，不可修改！')) {
+                const orderNo = document.getElementById('returnOrderNo').value;
+                const actualReturnDate = document.getElementById('actualReturnDate').value;
+                const overdueDays = document.getElementById('overdueDays').value;
+                const overdueFee = document.getElementById('overdueFee').value;
+                const actualRefundDeposit = document.getElementById('actualRefundDeposit').value;
+                const returnRemark = document.getElementById('returnRemark').value;
+                const orderIndex = rentalOrders.findIndex(o => o.orderNo === orderNo);
+                if (orderIndex > -1) {
+                    rentalOrders[orderIndex].status = '已归还';
+                    rentalOrders[orderIndex].actualReturnDate = actualReturnDate;
+                    rentalOrders[orderIndex].overdueDays = overdueDays;
+                    rentalOrders[orderIndex].overdueFee = overdueFee;
+                    rentalOrders[orderIndex].actualRefundDeposit = actualRefundDeposit;
+                    rentalOrders[orderIndex].returnRemark = returnRemark;
+                    rentalOrders[orderIndex].cartridges.forEach(item => {
+                        const cartridgeIndex = gameCartridges.findIndex(c => c.id === item.cartridgeId);
+                        if (cartridgeIndex > -1) {
+                            gameCartridges[cartridgeIndex].status = '可租';
+                            gameCartridges[cartridgeIndex].lastAvailableDate = getToday();
+                        }
+                    });
+                    saveData();
+                    alert('归还结算完成！');
+                    document.getElementById('returnOrderInfo').style.display = 'none';
+                    document.getElementById('returnSearchInput').value = '';
+                    renderAllPage();
+                }
+            }
+        });
+
+        // ===================== 弹窗通用关闭事件 =====================
+        document.querySelectorAll('.modal-close, [id$="ModalCancel"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modalId = this.id.replace('Close', '').replace('Cancel', '');
+                document.getElementById(modalId).classList.remove('active');
+            });
+        });
+
+        // ===================== 页面渲染通用函数 =====================
+        function renderDashboard() {
+            // 订单统计
+            document.getElementById('totalOrders').textContent = rentalOrders.length;
+            document.getElementById('pendingShipOrders').textContent = rentalOrders.filter(o => o.status === '待发货').length;
+            document.getElementById('todayShipOrders').textContent = rentalOrders.filter(o => o.shipDate === getToday()).length;
+            document.getElementById('activeOrders').textContent = rentalOrders.filter(o => o.status === '已发货' || o.status === '已逾期').length;
+            document.getElementById('completedOrders').textContent = rentalOrders.filter(o => o.status === '已完成').length;
+            const todayRent = rentalOrders.filter(o => o.rentalStartDate === getToday()).reduce((sum, o) => sum + Number(o.totalRent), 0);
+            document.getElementById('todayRent').textContent = `¥${todayRent.toFixed(2)}`;
+
+            // 库龄预警统计
+            let warning1 = 0, warning2 = 0, warning3 = 0;
+            gameCartridges.forEach(c => {
+                const { warningLevel } = calculateStockAge(c);
+                if (warningLevel === 3) warning3++;
+                else if (warningLevel === 2) warning2++;
+                else if (warningLevel === 1) warning1++;
+            });
+            document.getElementById('warningLevel1').textContent = warning1;
+            document.getElementById('warningLevel2').textContent = warning2;
+            document.getElementById('warningLevel3').textContent = warning3;
+
+            // 零售营收统计
+            const totalSold = stockOutOrders.reduce((sum, o) => sum + Number(o.soldAmount || 0), 0);
+            document.getElementById('totalSoldRevenue').textContent = `¥${totalSold.toFixed(2)}`;
+
+            // 资产统计
+            document.getElementById('totalCartridges').textContent = gameCartridges.length;
+            document.getElementById('availableCartridges').textContent = gameCartridges.filter(c => c.status === '可租').length;
+            document.getElementById('rentedCartridges').textContent = gameCartridges.filter(c => c.status === '租赁中' || c.status === '已占用').length;
+            const totalValue = gameCartridges.reduce((sum, c) => sum + Number(c.price), 0);
+            document.getElementById('totalAssetValue').textContent = `¥${totalValue.toFixed(2)}`;
+
+            // 游戏出租率排行
+            const gameSummary = {};
+            gameCartridges.forEach(cartridge => {
+                if (!gameSummary[cartridge.name]) {
+                    gameSummary[cartridge.name] = { total: 0, rented: 0 };
+                }
+                gameSummary[cartridge.name].total++;
+                if (cartridge.status === '租赁中' || cartridge.status === '已占用') gameSummary[cartridge.name].rented++;
+            });
+            const rankTable = document.getElementById('gameRankTable').querySelector('tbody');
+            rankTable.innerHTML = '';
+            Object.keys(gameSummary).sort((a,b) => (gameSummary[b].rented/gameSummary[b].total) - (gameSummary[a].rented/gameSummary[a].total)).forEach(name => {
+                const data = gameSummary[name];
+                const rate = data.total > 0 ? ((data.rented / data.total) * 100).toFixed(2) + '%' : '0%';
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${name}</td><td>${data.total}</td><td>${data.rented}</td><td>${rate}</td>`;
+                rankTable.appendChild(row);
+            });
+        }
+
+        function renderStockTable() {
+            const searchInput = document.getElementById('stockSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('stockStatusFilter').value;
+            const warningFilter = document.getElementById('stockWarningFilter').value;
+            const filtered = gameCartridges.filter(cartridge => {
+                const matchSearch = 
+                    cartridge.code.toLowerCase().includes(searchInput) ||
+                    cartridge.name.toLowerCase().includes(searchInput) ||
+                    cartridge.version.toLowerCase().includes(searchInput) ||
+                    cartridge.shelf.toLowerCase().includes(searchInput) ||
+                    (cartridge.purchaseSource && cartridge.purchaseSource.toLowerCase().includes(searchInput));
+                const matchStatus = statusFilter ? cartridge.status === statusFilter : true;
+                const { warningLevel } = calculateStockAge(cartridge);
+                const matchWarning = warningFilter ? warningLevel == warningFilter : true;
+                return matchSearch && matchStatus && matchWarning;
+            });
+            const tableBody = document.getElementById('stockTable').querySelector('tbody');
+            tableBody.innerHTML = '';
+            filtered.forEach(cartridge => {
+                const { totalAge, idleAge, warningLevel } = calculateStockAge(cartridge);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cartridge.code}</td>
+                    <td>${cartridge.name}</td>
+                    <td>${cartridge.version}</td>
+                    <td>${cartridge.condition}</td>
+                    <td>${totalAge}</td>
+                    <td>${idleAge}</td>
+                    <td>${getWarningBadge(warningLevel)}</td>
+                    <td>¥${Number(cartridge.price).toFixed(2)}</td>
+                    <td>${getStatusBadge(cartridge.status)}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary btn-sm edit-cartridge-btn" data-id="${cartridge.id}"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="btn btn-danger btn-sm delete-cartridge-btn" data-id="${cartridge.id}" ${cartridge.status !== '可租' && cartridge.status !== '维修中' ? 'disabled' : ''}><i class="fas fa-trash"></i> 删除</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function renderAllPage() {
+            renderDashboard();
+            renderStockTable();
+            renderStockAgeTable();
+            renderOutCartridgeTable();
+            renderStockOutTable();
+            renderShipOrderTable();
+            renderActiveOrderTable();
+            renderFollowTable();
+            renderGameNameTable();
+            renderPackageTable();
+            renderSourceTable();
+            renderOutTypeTable();
+        }
+
+        // ===================== 页面初始化 =====================
+        window.onload = function() {
+            // 历史数据兼容处理
+            initOldCartridgeData();
+            
+            // 初始化下拉选项
+            initRentalPackageSelect();
+            initOrderSourceSelect();
+            initOutTypeSelect();
+            
+            // 初始化默认日期
+            document.getElementById('rentalStartDate').value = getToday();
+            document.getElementById('inPurchaseDate').value = getToday();
+            document.getElementById('outDate').value = getToday();
+            document.getElementById('warningLevel1Days').value = stockConfig.warningLevel1;
+            document.getElementById('warningLevel2Days').value = stockConfig.warningLevel2;
+            document.getElementById('warningLevel3Days').value = stockConfig.warningLevel3;
+            
+            // 初始化搜索配置
+            searchConfig.forEach(field => {
+                document.getElementById(`searchField_${field}`).checked = true;
+            });
+            
+            // 绑定事件
+            bindCartridgeItemEvents(0);
+            bindGameNameSearchEvents();
+            
+            // 渲染所有页面
+            renderAllPage();
+
+            // 一键备份/还原按钮
+            document.getElementById('quickBackupBtn').addEventListener('click', backupAllData);
+            document.getElementById('quickRestoreBtn').addEventListener('click', function() {
+                document.getElementById('restoreFileInput').click();
+            });
+        };
+    </script>
+</body>
+</html>
